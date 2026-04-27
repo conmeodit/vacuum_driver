@@ -29,8 +29,6 @@ setup(
     entry_points={
         'console_scripts': [
             'pure_driver = vacuum_driver.pure_driver:main',
-            'exploration_node = vacuum_driver.exploration_node:main',
-            'coverage_planner_node = vacuum_driver.coverage_planner_node:main',
             'slam_session_manager_node = vacuum_driver.slam_session_manager_node:main',
         ],
     },
