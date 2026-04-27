@@ -1,0 +1,26 @@
+running develop
+running egg_info
+writing vacuum_driver.egg-info/PKG-INFO
+writing dependency_links to vacuum_driver.egg-info/dependency_links.txt
+writing entry points to vacuum_driver.egg-info/entry_points.txt
+writing requirements to vacuum_driver.egg-info/requires.txt
+writing top-level names to vacuum_driver.egg-info/top_level.txt
+reading manifest file 'vacuum_driver.egg-info/SOURCES.txt'
+writing manifest file 'vacuum_driver.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum-driver.egg-link (link to .)
+Installing coverage_planner_node script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+Installing exploration_node script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+Installing pure_driver script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+
+Installed /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver
+running symlink_data
+creating /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/launch
+symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/launch/mapping.launch.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/launch
+symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/launch/nav2_navigation.launch.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/launch
+symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/launch/autonomous_mapping.launch.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/launch
+creating /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/config
+symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/config/slam.yaml -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/config
+symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/config/nav2_params.yaml -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/config
+creating /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/rviz
+symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/rviz/mapping.rviz -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/rviz

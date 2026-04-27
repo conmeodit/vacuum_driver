@@ -1,0 +1,28 @@
+[0.615s] Invoking command in '/home/linh-pham/Downloads/vacuum_driver': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/vacuum_driver build --build-base /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build install --record /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/install.log --single-version-externally-managed install_data
+[0.817s] running egg_info
+[0.833s] writing build/vacuum_driver/vacuum_driver.egg-info/PKG-INFO
+[0.833s] writing dependency_links to build/vacuum_driver/vacuum_driver.egg-info/dependency_links.txt
+[0.833s] writing entry points to build/vacuum_driver/vacuum_driver.egg-info/entry_points.txt
+[0.833s] writing requirements to build/vacuum_driver/vacuum_driver.egg-info/requires.txt
+[0.834s] writing top-level names to build/vacuum_driver/vacuum_driver.egg-info/top_level.txt
+[0.864s] reading manifest file 'build/vacuum_driver/vacuum_driver.egg-info/SOURCES.txt'
+[0.864s] writing manifest file 'build/vacuum_driver/vacuum_driver.egg-info/SOURCES.txt'
+[0.864s] running build
+[0.864s] running build_py
+[0.865s] copying vacuum_driver/exploration_node.py -> /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build/lib/vacuum_driver
+[0.865s] running install
+[0.870s] running install_lib
+[0.885s] copying /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build/lib/vacuum_driver/exploration_node.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver
+[0.885s] byte-compiling /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver/exploration_node.py to exploration_node.cpython-312.pyc
+[0.894s] running install_data
+[0.894s] copying launch/autonomous_mapping.launch.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/launch
+[0.894s] running install_egg_info
+[0.911s] removing '/home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver-0.0.0-py3.12.egg-info' (and everything under it)
+[0.911s] Copying build/vacuum_driver/vacuum_driver.egg-info to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver-0.0.0-py3.12.egg-info
+[0.911s] running install_scripts
+[1.010s] Installing coverage_planner_node script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.010s] Installing exploration_node script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.010s] Installing pure_driver script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.010s] Installing slam_session_manager_node script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.010s] writing list of installed files to '/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/install.log'
+[1.035s] Invoked command in '/home/linh-pham/Downloads/vacuum_driver' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/vacuum_driver build --build-base /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build install --record /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/install.log --single-version-externally-managed install_data

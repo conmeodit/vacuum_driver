@@ -1,0 +1,22 @@
+running develop
+running egg_info
+creating vacuum_driver.egg-info
+writing vacuum_driver.egg-info/PKG-INFO
+writing dependency_links to vacuum_driver.egg-info/dependency_links.txt
+writing entry points to vacuum_driver.egg-info/entry_points.txt
+writing requirements to vacuum_driver.egg-info/requires.txt
+writing top-level names to vacuum_driver.egg-info/top_level.txt
+writing manifest file 'vacuum_driver.egg-info/SOURCES.txt'
+reading manifest file 'vacuum_driver.egg-info/SOURCES.txt'
+writing manifest file 'vacuum_driver.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum-driver.egg-link (link to .)
+Installing pure_driver script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+
+Installed /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver
+running symlink_data
+creating /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/ament_index
+creating /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/ament_index/resource_index
+creating /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/ament_index/resource_index/packages
+symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/resource/vacuum_driver -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/ament_index/resource_index/packages
+symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/package.xml -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver

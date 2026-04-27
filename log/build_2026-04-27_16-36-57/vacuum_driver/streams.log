@@ -1,0 +1,28 @@
+[0.629s] Invoking command in '/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build --no-deps symlink_data --force
+[0.890s] running develop
+[1.038s] running egg_info
+[1.052s] writing vacuum_driver.egg-info/PKG-INFO
+[1.052s] writing dependency_links to vacuum_driver.egg-info/dependency_links.txt
+[1.052s] writing entry points to vacuum_driver.egg-info/entry_points.txt
+[1.052s] writing requirements to vacuum_driver.egg-info/requires.txt
+[1.053s] writing top-level names to vacuum_driver.egg-info/top_level.txt
+[1.081s] reading manifest file 'vacuum_driver.egg-info/SOURCES.txt'
+[1.082s] writing manifest file 'vacuum_driver.egg-info/SOURCES.txt'
+[1.097s] running build_ext
+[1.097s] Creating /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum-driver.egg-link (link to .)
+[1.097s] Installing coverage_planner_node script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.097s] Installing exploration_node script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.098s] Installing pure_driver script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.098s] Installing slam_session_manager_node script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.098s] 
+[1.098s] Installed /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver
+[1.098s] running symlink_data
+[1.098s] symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/resource/vacuum_driver -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/ament_index/resource_index/packages
+[1.098s] symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/package.xml -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver
+[1.098s] symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/launch/mapping.launch.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/launch
+[1.098s] symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/launch/nav2_navigation.launch.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/launch
+[1.098s] symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/launch/autonomous_mapping.launch.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/launch
+[1.098s] symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/config/slam.yaml -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/config
+[1.098s] symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/config/nav2_params.yaml -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/config
+[1.098s] symbolically linking /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/rviz/mapping.rviz -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/rviz
+[1.131s] Invoked command in '/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build --no-deps symlink_data --force
