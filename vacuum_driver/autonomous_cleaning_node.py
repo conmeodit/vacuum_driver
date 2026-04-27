@@ -97,6 +97,7 @@ class AutonomousCleaningNode(Node):
         self.declare_parameter('robot_radius_m', 0.26)
         self.declare_parameter('obstacle_threshold', 50)
         self.declare_parameter('frontier_min_cluster_size', 8)
+        self.declare_parameter('frontier_relaxed_min_cluster_size', 3)
         self.declare_parameter('frontier_min_distance_m', 0.30)
         self.declare_parameter('frontier_gain_weight', 0.035)
         self.declare_parameter('frontier_blacklist_radius_m', 0.45)
@@ -104,12 +105,14 @@ class AutonomousCleaningNode(Node):
         self.declare_parameter('map_stable_duration_sec', 8.0)
         self.declare_parameter('exploration_settle_sec', 5.0)
         self.declare_parameter('map_stable_known_delta_cells', 12)
+        self.declare_parameter('map_stable_origin_delta_m', 0.06)
 
         self.declare_parameter('coverage_spacing_m', 0.24)
         self.declare_parameter('coverage_visited_radius_m', 0.24)
         self.declare_parameter('coverage_required_ratio', 0.985)
         self.declare_parameter('coverage_min_target_distance_m', 0.30)
         self.declare_parameter('coverage_gain_weight', 0.020)
+        self.declare_parameter('coverage_switch_distance_weight', 0.12)
 
         self.declare_parameter('goal_tolerance_m', 0.18)
         self.declare_parameter('path_lookahead_m', 0.30)
@@ -152,6 +155,9 @@ class AutonomousCleaningNode(Node):
         self.frontier_min_cluster_size = max(
             1, int(self.get_parameter('frontier_min_cluster_size').value)
         )
+        self.frontier_relaxed_min_cluster_size = max(
+            1, int(self.get_parameter('frontier_relaxed_min_cluster_size').value)
+        )
         self.frontier_min_distance_m = max(
             0.0, float(self.get_parameter('frontier_min_distance_m').value)
         )
@@ -173,6 +179,9 @@ class AutonomousCleaningNode(Node):
         self.map_stable_known_delta_cells = max(
             0, int(self.get_parameter('map_stable_known_delta_cells').value)
         )
+        self.map_stable_origin_delta_m = max(
+            0.0, float(self.get_parameter('map_stable_origin_delta_m').value)
+        )
 
         self.coverage_spacing_m = max(0.05, float(self.get_parameter('coverage_spacing_m').value))
         self.coverage_visited_radius_m = max(
@@ -186,6 +195,9 @@ class AutonomousCleaningNode(Node):
         )
         self.coverage_gain_weight = max(
             0.0, float(self.get_parameter('coverage_gain_weight').value)
+        )
+        self.coverage_switch_distance_weight = max(
+            0.0, float(self.get_parameter('coverage_switch_distance_weight').value)
         )
 
         self.goal_tolerance_m = max(0.05, float(self.get_parameter('goal_tolerance_m').value))
@@ -251,6 +263,7 @@ class AutonomousCleaningNode(Node):
         self.known_count = 0
         self.last_known_count = 0
         self.known_stable_since = self.now_sec()
+        self.geometry_stable_since = self.now_sec()
 
         self.phase = Phase.EXPLORE
         self.pose: Optional[Pose2D] = None
@@ -273,6 +286,7 @@ class AutonomousCleaningNode(Node):
         self.last_total_reachable = 0
         self.last_frontier_cells: List[Tuple[int, int]] = []
         self.no_frontier_since: Optional[float] = None
+        self.last_coverage_goal: Optional[Tuple[float, float]] = None
 
         self.blacklisted_targets: Dict[int, float] = {}
         self.recovery_stage = RecoveryStage.NONE
@@ -297,6 +311,9 @@ class AutonomousCleaningNode(Node):
         return float(self.get_clock().now().nanoseconds) * 1e-9
 
     def map_cb(self, msg: OccupancyGrid):
+        had_previous_map = self.map_msg is not None and self.width > 0 and self.height > 0
+        previous_geometry = self._current_geometry() if had_previous_map else None
+
         self.map_msg = msg
         self.width = int(msg.info.width)
         self.height = int(msg.info.height)
@@ -309,13 +326,25 @@ class AutonomousCleaningNode(Node):
         self.origin_sin = math.sin(self.origin_yaw)
         self.map_version += 1
 
-        self.known_count = sum(1 for value in msg.data if int(value) >= 0)
         now = self.now_sec()
+        geometry_changed = False
+        if previous_geometry is not None:
+            geometry_changed = self._geometry_changed(previous_geometry)
+            if geometry_changed:
+                self.geometry_stable_since = now
+        else:
+            self.geometry_stable_since = now
+
+        self.known_count = sum(1 for value in msg.data if int(value) >= 0)
         if abs(self.known_count - self.last_known_count) > self.map_stable_known_delta_cells:
             self.known_stable_since = now
             self.last_known_count = self.known_count
 
         self._build_passability()
+        if geometry_changed and previous_geometry is not None:
+            self._remap_spatial_state(previous_geometry, now)
+        else:
+            self._filter_spatial_state()
 
     def scan_cb(self, msg: LaserScan):
         self.sectors = ScanSectors(
@@ -485,6 +514,8 @@ class AutonomousCleaningNode(Node):
             start = nearest
 
         if self.target is not None and self._target_reached(self.target):
+            if self.target.kind == 'coverage':
+                self.last_coverage_goal = self.target.world
             if self.target.kind == 'frontier':
                 self._clear_navigation()
             else:
@@ -531,6 +562,15 @@ class AutonomousCleaningNode(Node):
                 self.no_frontier_since = None
                 return target
 
+            relaxed_target = self._select_frontier_target(
+                start,
+                now,
+                min_cluster_size=self.frontier_relaxed_min_cluster_size,
+            )
+            if relaxed_target is not None:
+                self.no_frontier_since = None
+                return relaxed_target
+
             if self.no_frontier_since is None:
                 self.no_frontier_since = now
                 self.get_logger().info('No reachable frontier found; waiting for map to settle.')
@@ -538,31 +578,56 @@ class AutonomousCleaningNode(Node):
             if (
                 (now - self.no_frontier_since) >= self.exploration_settle_sec
                 and (now - self.known_stable_since) >= self.map_stable_duration_sec
+                and (now - self.geometry_stable_since) >= self.map_stable_duration_sec
             ):
                 self.phase = Phase.COVER
                 self._clear_navigation(keep_phase=True)
+                self.last_coverage_goal = None
                 self.get_logger().info('Map is stable. Switching to coverage mode.')
                 return self._select_coverage_target(start, now)
             return None
 
         if self.phase == Phase.COVER:
+            if (now - self.geometry_stable_since) < self.map_stable_duration_sec:
+                target = self._select_frontier_target(
+                    start,
+                    now,
+                    min_cluster_size=self.frontier_relaxed_min_cluster_size,
+                )
+                if target is not None:
+                    self.phase = Phase.EXPLORE
+                    self.no_frontier_since = None
+                    self.get_logger().info(
+                        'Map expanded while covering. Resuming frontier exploration.'
+                    )
+                    return target
             return self._select_coverage_target(start, now)
 
         return None
 
-    def _select_frontier_target(self, start: Tuple[int, int], now: float) -> Optional[Target]:
+    def _select_frontier_target(
+        self,
+        start: Tuple[int, int],
+        now: float,
+        min_cluster_size: Optional[int] = None,
+    ) -> Optional[Target]:
         distances = self._distance_field(start)
         if not distances:
             return None
 
         frontier_mask = self._frontier_mask()
-        clusters = self._frontier_clusters(frontier_mask)
+        effective_min_cluster_size = (
+            self.frontier_min_cluster_size
+            if min_cluster_size is None
+            else max(1, min_cluster_size)
+        )
+        clusters = self._frontier_clusters(frontier_mask, effective_min_cluster_size)
         candidates: List[Target] = []
         self.last_frontier_cells = []
 
         for cluster in clusters:
             reachable_cells = [cell for cell in cluster if self._index(*cell) in distances]
-            if len(reachable_cells) < self.frontier_min_cluster_size:
+            if len(reachable_cells) < effective_min_cluster_size:
                 continue
             self.last_frontier_cells.extend(reachable_cells[:16])
             best_cell = min(
@@ -602,7 +667,11 @@ class AutonomousCleaningNode(Node):
                     mask[index] = 1
         return mask
 
-    def _frontier_clusters(self, mask: bytearray) -> List[List[Tuple[int, int]]]:
+    def _frontier_clusters(
+        self,
+        mask: bytearray,
+        min_cluster_size: int,
+    ) -> List[List[Tuple[int, int]]]:
         clusters: List[List[Tuple[int, int]]] = []
         visited = bytearray(len(mask))
         for index, is_frontier in enumerate(mask):
@@ -624,7 +693,7 @@ class AutonomousCleaningNode(Node):
                         visited[ni] = 1
                         queue.append((nx, ny))
 
-            if len(cluster) >= self.frontier_min_cluster_size:
+            if len(cluster) >= min_cluster_size:
                 clusters.append(cluster)
 
         return clusters
@@ -653,6 +722,7 @@ class AutonomousCleaningNode(Node):
 
         stride = max(1, int(round(self.coverage_spacing_m / max(self.resolution, 1e-6))))
         candidates: List[Target] = []
+        continuity_anchor = self.last_coverage_goal
         for gy in range(0, self.height, stride):
             for gx in range(0, self.width, stride):
                 index = self._index(gx, gy)
@@ -668,7 +738,16 @@ class AutonomousCleaningNode(Node):
                 gain = self._local_unvisited_gain(gx, gy)
                 heading = math.atan2(world[1] - self.pose.y, world[0] - self.pose.x)
                 heading_cost = abs(normalize_angle(heading - self.pose.yaw)) * 0.08
-                score = travel + heading_cost - self.coverage_gain_weight * gain
+                continuity_cost = 0.0
+                if continuity_anchor is not None:
+                    continuity_cost = (
+                        self.coverage_switch_distance_weight
+                        * math.hypot(
+                            world[0] - continuity_anchor[0],
+                            world[1] - continuity_anchor[1],
+                        )
+                    )
+                score = travel + heading_cost + continuity_cost - self.coverage_gain_weight * gain
                 candidates.append(Target((gx, gy), world, 'coverage', score))
 
         if candidates:
@@ -1242,6 +1321,117 @@ class AutonomousCleaningNode(Node):
         for index in range(1, len(path)):
             total += math.hypot(path[index][0] - path[index - 1][0], path[index][1] - path[index - 1][1])
         return total
+
+    def _current_geometry(self) -> Dict[str, float]:
+        return {
+            'width': float(self.width),
+            'height': float(self.height),
+            'resolution': float(self.resolution),
+            'origin_x': float(self.origin_x),
+            'origin_y': float(self.origin_y),
+            'origin_yaw': float(self.origin_yaw),
+            'origin_cos': float(self.origin_cos),
+            'origin_sin': float(self.origin_sin),
+        }
+
+    def _geometry_changed(self, previous: Dict[str, float]) -> bool:
+        if int(previous['width']) != self.width or int(previous['height']) != self.height:
+            return True
+        if abs(previous['resolution'] - self.resolution) > 1e-9:
+            return True
+        if abs(previous['origin_x'] - self.origin_x) > self.map_stable_origin_delta_m:
+            return True
+        if abs(previous['origin_y'] - self.origin_y) > self.map_stable_origin_delta_m:
+            return True
+        yaw_delta = abs(normalize_angle(previous['origin_yaw'] - self.origin_yaw))
+        return yaw_delta > math.radians(1.0)
+
+    def _grid_to_world_in_geometry(
+        self,
+        gx: int,
+        gy: int,
+        geometry: Dict[str, float],
+    ) -> Tuple[float, float]:
+        local_x = (float(gx) + 0.5) * geometry['resolution']
+        local_y = (float(gy) + 0.5) * geometry['resolution']
+        world_x = (
+            geometry['origin_x']
+            + geometry['origin_cos'] * local_x
+            - geometry['origin_sin'] * local_y
+        )
+        world_y = (
+            geometry['origin_y']
+            + geometry['origin_sin'] * local_x
+            + geometry['origin_cos'] * local_y
+        )
+        return world_x, world_y
+
+    def _remap_spatial_state(self, previous_geometry: Dict[str, float], now: float):
+        old_width = int(previous_geometry['width'])
+        old_height = int(previous_geometry['height'])
+        old_total = old_width * old_height
+
+        remapped_visited: Set[int] = set()
+        for index in self.visited_cells:
+            if index < 0 or index >= old_total:
+                continue
+            gx = index % old_width
+            gy = index // old_width
+            world_x, world_y = self._grid_to_world_in_geometry(gx, gy, previous_geometry)
+            mapped = self.world_to_grid(world_x, world_y)
+            if mapped is None:
+                continue
+            mapped_index = self._index(mapped[0], mapped[1])
+            if self.passable[mapped_index]:
+                remapped_visited.add(mapped_index)
+        self.visited_cells = remapped_visited
+
+        remapped_blacklist: Dict[int, float] = {}
+        for index, expires_at in self.blacklisted_targets.items():
+            if expires_at <= now:
+                continue
+            if index < 0 or index >= old_total:
+                continue
+            gx = index % old_width
+            gy = index // old_width
+            world_x, world_y = self._grid_to_world_in_geometry(gx, gy, previous_geometry)
+            mapped = self.world_to_grid(world_x, world_y)
+            if mapped is None:
+                continue
+            mapped_index = self._index(mapped[0], mapped[1])
+            remapped_blacklist[mapped_index] = max(
+                remapped_blacklist.get(mapped_index, 0.0),
+                expires_at,
+            )
+        self.blacklisted_targets = remapped_blacklist
+
+        if self.target is not None:
+            mapped = self.world_to_grid(self.target.world[0], self.target.world[1])
+            if mapped is None or not self._is_passable(mapped[0], mapped[1]):
+                self.target = None
+            else:
+                self.target.grid = mapped
+
+        self.path_cells = []
+        self.path_world = []
+        self.path_cursor = 0
+        self.planned_map_version = -1
+        self.last_replan_time = 0.0
+        self.last_frontier_cells = []
+
+    def _filter_spatial_state(self):
+        total = self.width * self.height
+        filtered_visited = set()
+        for index in self.visited_cells:
+            if 0 <= index < total and self.passable[index]:
+                filtered_visited.add(index)
+        self.visited_cells = filtered_visited
+
+        filtered_blacklist = {}
+        for index, expires_at in self.blacklisted_targets.items():
+            if 0 <= index < total:
+                filtered_blacklist[index] = expires_at
+        self.blacklisted_targets = filtered_blacklist
 
     def _nearest_passable_to_pose(self) -> Optional[Tuple[int, int]]:
         if self.pose is None:

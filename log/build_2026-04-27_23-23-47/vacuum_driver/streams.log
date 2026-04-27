@@ -1,0 +1,43 @@
+[0.572s] Invoking command in '/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --uninstall --editable --build-directory /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build
+[0.782s] running develop
+[0.917s] Removing /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum-driver.egg-link (link to .)
+[0.942s] Invoked command in '/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --uninstall --editable --build-directory /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build
+[0.943s] Invoking command in '/home/linh-pham/Downloads/vacuum_driver': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/vacuum_driver build --build-base /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build install --record /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/install.log --single-version-externally-managed install_data --force
+[1.129s] running egg_info
+[1.141s] writing build/vacuum_driver/vacuum_driver.egg-info/PKG-INFO
+[1.141s] writing dependency_links to build/vacuum_driver/vacuum_driver.egg-info/dependency_links.txt
+[1.141s] writing entry points to build/vacuum_driver/vacuum_driver.egg-info/entry_points.txt
+[1.142s] writing requirements to build/vacuum_driver/vacuum_driver.egg-info/requires.txt
+[1.142s] writing top-level names to build/vacuum_driver/vacuum_driver.egg-info/top_level.txt
+[1.168s] reading manifest file 'build/vacuum_driver/vacuum_driver.egg-info/SOURCES.txt'
+[1.169s] writing manifest file 'build/vacuum_driver/vacuum_driver.egg-info/SOURCES.txt'
+[1.169s] running build
+[1.169s] running build_py
+[1.169s] copying vacuum_driver/autonomous_cleaning_node.py -> /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build/lib/vacuum_driver
+[1.169s] running install
+[1.174s] running install_lib
+[1.188s] creating /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver
+[1.188s] copying /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build/lib/vacuum_driver/__init__.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver
+[1.188s] copying /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build/lib/vacuum_driver/pure_driver.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver
+[1.188s] copying /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build/lib/vacuum_driver/autonomous_cleaning_node.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver
+[1.188s] copying /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build/lib/vacuum_driver/slam_session_manager_node.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver
+[1.189s] byte-compiling /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver/__init__.py to __init__.cpython-312.pyc
+[1.189s] byte-compiling /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver/pure_driver.py to pure_driver.cpython-312.pyc
+[1.194s] byte-compiling /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver/autonomous_cleaning_node.py to autonomous_cleaning_node.cpython-312.pyc
+[1.204s] byte-compiling /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver/slam_session_manager_node.py to slam_session_manager_node.cpython-312.pyc
+[1.204s] running install_data
+[1.204s] copying resource/vacuum_driver -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/ament_index/resource_index/packages
+[1.204s] copying package.xml -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver
+[1.205s] copying launch/mapping.launch.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/launch
+[1.205s] copying launch/autonomous_mapping.launch.py -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/launch
+[1.205s] copying config/slam.yaml -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/config
+[1.205s] copying rviz/mapping.rviz -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/rviz
+[1.205s] copying urdf/vacuum_robot.urdf -> /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/share/vacuum_driver/urdf
+[1.205s] running install_egg_info
+[1.220s] Copying build/vacuum_driver/vacuum_driver.egg-info to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages/vacuum_driver-0.0.0-py3.12.egg-info
+[1.220s] running install_scripts
+[1.309s] Installing autonomous_cleaning_node script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.309s] Installing pure_driver script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.309s] Installing slam_session_manager_node script to /home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/vacuum_driver
+[1.309s] writing list of installed files to '/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/install.log'
+[1.333s] Invoked command in '/home/linh-pham/Downloads/vacuum_driver' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/linh-pham/Downloads/vacuum_driver/install/vacuum_driver/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/vacuum_driver build --build-base /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/build install --record /home/linh-pham/Downloads/vacuum_driver/build/vacuum_driver/install.log --single-version-externally-managed install_data --force
