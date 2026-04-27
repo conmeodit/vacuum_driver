@@ -16,6 +16,7 @@ setup(
         (f'share/{package_name}/launch', glob('launch/*.launch.py')),
         (f'share/{package_name}/config', glob('config/*.yaml')),
         (f'share/{package_name}/rviz', glob('rviz/*.rviz')),
+        (f'share/{package_name}/urdf', glob('urdf/*.urdf')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -29,6 +30,7 @@ setup(
     entry_points={
         'console_scripts': [
             'pure_driver = vacuum_driver.pure_driver:main',
+            'autonomous_cleaning_node = vacuum_driver.autonomous_cleaning_node:main',
             'slam_session_manager_node = vacuum_driver.slam_session_manager_node:main',
         ],
     },
