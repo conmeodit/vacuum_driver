@@ -44,7 +44,7 @@ Visualization Manager:
         Value: /scan
       Value: true
     - Class: rviz_default_plugins/Odometry
-      Enabled: true
+      Enabled: false
       Name: Odometry
       Topic:
         Depth: 5
@@ -52,7 +52,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /odom
-      Value: true
+      Value: false
     - Class: rviz_default_plugins/Map
       Enabled: true
       Name: Map
@@ -63,6 +63,30 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /map
       Value: true
+    - Class: rviz_default_plugins/Map
+      Alpha: 0.7
+      Color Scheme: costmap
+      Enabled: false
+      Name: Global Costmap
+      Topic:
+        Depth: 1
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /global_costmap/costmap
+      Value: false
+    - Class: rviz_default_plugins/Map
+      Alpha: 0.7
+      Color Scheme: costmap
+      Enabled: false
+      Name: Local Costmap
+      Topic:
+        Depth: 1
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /local_costmap/costmap
+      Value: false
     - Class: rviz_default_plugins/RobotModel
       Description Source: Topic
       Description Topic:

@@ -11,8 +11,8 @@ Provided nodes:
 ## Build
 
 ```bash
+rm -rf ~/ros2_ws/build/vacuum_driver ~/ros2_ws/install/vacuum_driver
 cd ~/ros2_ws
-source /opt/ros/jazzy/setup.bash
 colcon build --base-paths src/vacuum_driver --packages-select vacuum_driver --symlink-install
 source install/setup.bash
 ```

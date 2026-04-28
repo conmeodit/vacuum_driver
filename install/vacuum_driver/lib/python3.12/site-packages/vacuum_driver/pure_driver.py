@@ -131,7 +131,9 @@ class PureWebotsDriver(Node):
         self.declare_parameter('scan_filter_temporal_jump_threshold_m', 0.20)
 
         self.declare_parameter('scan_topic', '/scan')
+        self.declare_parameter('scan_raw_topic', '/scan/raw')
         self.declare_parameter('odom_topic', '/odom')
+        self.declare_parameter('odom_raw_topic', '/odom/raw')
         self.declare_parameter('cmd_vel_topic', DEFAULT_CMD_VEL_TOPIC)
         self.declare_parameter('imu_topic', '/imu/data')
         self.declare_parameter('imu_raw_topic', '/imu/data_raw')
@@ -205,7 +207,9 @@ class PureWebotsDriver(Node):
         )
 
         self.scan_topic = str(self.get_parameter('scan_topic').value)
+        self.scan_raw_topic = str(self.get_parameter('scan_raw_topic').value)
         self.odom_topic = str(self.get_parameter('odom_topic').value)
+        self.odom_raw_topic = str(self.get_parameter('odom_raw_topic').value)
         self.cmd_vel_topic = str(self.get_parameter('cmd_vel_topic').value)
         self.imu_topic = str(self.get_parameter('imu_topic').value)
         self.imu_raw_topic = str(self.get_parameter('imu_raw_topic').value)
@@ -282,6 +286,9 @@ class PureWebotsDriver(Node):
         self.x = 0.0
         self.y = 0.0
         self.yaw = 0.0
+        self.x_raw = 0.0
+        self.y_raw = 0.0
+        self.yaw_raw = 0.0
         self.prev_left_pos = None
         self.prev_right_pos = None
 
@@ -370,7 +377,9 @@ class PureWebotsDriver(Node):
                 self.use_imu_for_odom = False
 
         self.scan_pub = self.create_publisher(LaserScan, self.scan_topic, 10)
+        self.scan_raw_pub = self.create_publisher(LaserScan, self.scan_raw_topic, 10)
         self.odom_pub = self.create_publisher(Odometry, self.odom_topic, 10)
+        self.odom_raw_pub = self.create_publisher(Odometry, self.odom_raw_topic, 10)
         self.imu_pub = self.create_publisher(Imu, self.imu_topic, 10)
         self.imu_raw_pub = self.create_publisher(Imu, self.imu_raw_topic, 10)
         self.cmd_sub = self.create_subscription(
@@ -649,7 +658,15 @@ class PureWebotsDriver(Node):
                     delta_yaw_enc = (delta_right - delta_left) / max(
                         self.wheel_separation, 1e-6
                     )
-                    delta_yaw = delta_yaw_enc * self.odom_angular_scale
+                    delta_yaw_raw = delta_yaw_enc * self.odom_angular_scale
+                    delta_yaw = delta_yaw_raw
+                    # --- Khâu 1: Publish odom raw (encoder thuần) ---
+                    raw_linear_vel = delta_s / max(self.dt, 1e-6)
+                    raw_angular_vel = delta_yaw_raw / max(self.dt, 1e-6)
+                    self._publish_odom_raw(stamp, delta_s, delta_yaw_raw,
+                                          raw_linear_vel, raw_angular_vel)
+
+                    # --- Khâu 2: IMU yaw fusion (tiền xử lý) ---
                     if self.use_imu_for_odom and self.imu_mode != 'none':
                         delta_yaw = (
                             (1.0 - self.imu_yaw_blend) * delta_yaw
@@ -724,12 +741,65 @@ class PureWebotsDriver(Node):
             tf_msg.transform.rotation.w = qw
             self.tf_broadcaster.sendTransform(tf_msg)
 
+    def _publish_odom_raw(self, stamp, delta_s, delta_yaw_raw,
+                          linear_vel, angular_vel):
+        """Publish encoder-only odometry (Khâu 1: thu dữ liệu)."""
+        self.x_raw += delta_s * math.cos(self.yaw_raw + 0.5 * delta_yaw_raw)
+        self.y_raw += delta_s * math.sin(self.yaw_raw + 0.5 * delta_yaw_raw)
+        self.yaw_raw = _normalize_angle(self.yaw_raw + delta_yaw_raw)
+
+        qx, qy, qz, qw = _quat_from_rpy(0.0, 0.0, self.yaw_raw)
+
+        odom_raw = Odometry()
+        odom_raw.header.stamp = stamp
+        odom_raw.header.frame_id = self.odom_frame_id
+        odom_raw.child_frame_id = self.base_frame_id
+        odom_raw.pose.pose.position.x = self.x_raw
+        odom_raw.pose.pose.position.y = self.y_raw
+        odom_raw.pose.pose.position.z = 0.0
+        odom_raw.pose.pose.orientation.x = qx
+        odom_raw.pose.pose.orientation.y = qy
+        odom_raw.pose.pose.orientation.z = qz
+        odom_raw.pose.pose.orientation.w = qw
+        odom_raw.twist.twist.linear.x = linear_vel
+        odom_raw.twist.twist.angular.z = angular_vel
+
+        raw_cov = [0.0] * 36
+        raw_cov[0] = 0.05
+        raw_cov[7] = 0.05
+        raw_cov[14] = 99999.0
+        raw_cov[21] = 99999.0
+        raw_cov[28] = 99999.0
+        raw_cov[35] = 0.10
+        odom_raw.pose.covariance = raw_cov
+        odom_raw.twist.covariance = raw_cov
+        self.odom_raw_pub.publish(odom_raw)
+
     def _publish_scan(self, stamp):
         ranges = list(self.lidar.getRangeImage())
         if self.reverse_scan:
             ranges.reverse()
 
-        clean_ranges = self._filter_scan_ranges(ranges)
+        # Normalize 1 lần duy nhất
+        normalized = [self._normalize_scan_range(v) for v in ranges]
+
+        # --- Khâu 1: Publish scan raw (lidar thô, chỉ normalize) ---
+        raw_scan = LaserScan()
+        raw_scan.header.stamp = stamp
+        raw_scan.header.frame_id = self.lidar_frame_id
+        raw_scan.angle_min = self.lidar_angle_min
+        raw_scan.angle_max = self.lidar_angle_max
+        raw_scan.angle_increment = self.lidar_angle_increment
+        raw_scan.time_increment = 0.0
+        raw_scan.scan_time = self.dt
+        raw_scan.range_min = self.lidar_min_range
+        raw_scan.range_max = self.lidar_max_range
+        raw_scan.ranges = list(normalized)
+        raw_scan.intensities = []
+        self.scan_raw_pub.publish(raw_scan)
+
+        # --- Khâu 2: Publish scan filtered (tiền xử lý) ---
+        clean_ranges = self._filter_scan_ranges(normalized)
 
         scan = LaserScan()
         scan.header.stamp = stamp
@@ -821,11 +891,11 @@ class PureWebotsDriver(Node):
         self.prev_filtered_ranges = list(filtered)
         return filtered
 
-    def _filter_scan_ranges(self, ranges):
-        normalized = [self._normalize_scan_range(value) for value in ranges]
+    def _filter_scan_ranges(self, normalized):
+        """Filter pre-normalized scan ranges (Khâu 2: tiền xử lý)."""
         if not self.scan_filter_enabled:
             self.prev_filtered_ranges = list(normalized)
-            return normalized
+            return list(normalized)
 
         spatially_filtered = self._median_filter_scan(normalized)
         return self._temporal_filter_scan(spatially_filtered)
